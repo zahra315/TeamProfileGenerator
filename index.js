@@ -1,13 +1,15 @@
 const inquirer = require("inquirer");
 const fs = require("fs");
 const path = require("path");
-const { dirname } = require("node:path");
-const fileDirectory = path.resolve(--dirname, 'dist');
-const filePath = path.join(fileDirectory. 'index.html');
+// const { dirname } = require("node:path");
+const fileDirectory = path.resolve(__dirname, 'dist');
+const filePath = path.join(fileDirectory, 'index.html');
+const Manager = require('./lib/ManagerClass');
 const Engineer = require('./lib/EngineerClass');
 const Intern = require('./lib/InternClass');
-const Manager = require('./lib/ManagerClass');
-const Choices = require("inquirer/lib/objects/choices");
+const renderHTml = require('./lib/generateHTML')
+// const Choices = require("inquirer/lib/objects/choices");
+// const { async } = require("rxjs");
 
 let listOfEmployee = [];
 
@@ -108,4 +110,68 @@ const init = () => {
 };
 
 
+// Display new employee
+const newEmployee = async() => {
+    await inquirer.prompt(prompt)
+    .then((response) => {
+        let name = response.name;
+        let id = response.id;
+        let email = response.email;
+        let role = response.role;
+        let officeNumber;
+        let github;
+        let school;
+
+        if(role === "Manager") {
+            inquirer.prompt(managerPrompt).then((response) => {
+                officeNumber = response.officeNumber;
+                let employee = new Manager(name, id, email, officeNumber);
+                listOfEmployee.push(employee);
+                addEmployeeToList(listOfEmployee);
+            });
+        } else if(role == "Engineer") {
+            inquirer.prompt(engineerPrompt).then((response) => {
+                github = response.github;
+                let employee = new Engineer(name, id, email, github);
+                listOfEmployee.push(employee);
+                addEmployeeToList(listOfEmployee);
+            });
+        } else if(role === "Intern") {
+            inquirer.prompt(internPrompt).then((response) => {
+                school = response.school;
+                let employee = new Intern(name, id, email, school);
+                listOfEmployee.push(employee);
+                addEmployeeToList(listOfEmployee);
+            });
+        }
+    });
+};
+
+// 
+const addEmployeeToList = async(array) => {
+    await inquirer.prompt({
+        type:"confirm",
+        name:"addEmployee",
+        message:"Are you adding new employee? y/n"
+    })
+    .then(async(response) => {
+        const creatEmployee = response.addEmployee;
+        if(await creatEmployee === true) {
+            newEmployee();
+        }else {
+            if(!fs.existsSync(fileDirectory)) {
+                fs.mkdirSync(fileDirectory);
+            }
+            fs.writeFile(filePath, renderHTml(array), (error) => {
+                if(error) {
+                    console.log(error);
+                }
+                console.log("new index file has been generated");
+            });
+        }
+
+    });
+};
+
+init();
 
