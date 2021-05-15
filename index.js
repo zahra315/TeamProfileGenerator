@@ -59,7 +59,7 @@ engineerPrompt = [
     {
         type:"input",
         name:"github",
-        message:"Add link of GitHub URL",
+        message:"Enter your GitHub username",
         validate: github => {
             if(github) {
                 return true;
@@ -150,9 +150,9 @@ const newEmployee = async() => {
 // 
 const addEmployeeToList = async(array) => {
     await inquirer.prompt({
-        type:"confirm",
+        type:"confirm", 
         name:"addEmployee",
-        message:"Are you adding new employee? y/n"
+        message:"Are you adding new employee?" 
     })
     .then(async(response) => {
         const creatEmployee = response.addEmployee;
